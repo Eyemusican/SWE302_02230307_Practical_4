@@ -57,8 +57,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=SWE302_02230307_Practical_4 -Dsonar.organization=eyemusican
-
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=SWE302_02230307_Practical_4 \
+            -Dsonar.organization=eyemusican \
+            -Dsonar.branch.name=main
   security:
     needs: test
     name: SA scan using snyk
