@@ -111,7 +111,6 @@ jobs:
           echo "📦 Installing Snyk CLI..."
           npm install -g snyk
           snyk --version
-          snyk auth ${{ secrets.SNYK_TOKEN }}
 
       - name: Run Snyk Dependency Scan
         if: matrix.scan-type == 'dependencies'
@@ -120,11 +119,9 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           echo "🔍 Running Snyk dependency scan..."
-          # Try the action first
-          if ! snyk test --maven --severity-threshold=medium --sarif-file-output=snyk-dependencies.sarif; then
+          if ! snyk test --maven --org=eyemusican --severity-threshold=medium --sarif-file-output=snyk-dependencies.sarif; then
             echo "⚠️ Snyk test failed or found vulnerabilities, but continuing to generate SARIF"
-            # Ensure SARIF file is generated even if vulnerabilities are found
-            snyk test --maven --severity-threshold=medium --sarif-file-output=snyk-dependencies.sarif || true
+            snyk test --maven --org=eyemusican --severity-threshold=medium --sarif-file-output=snyk-dependencies.sarif || true
           fi
 
       - name: Run Snyk Code Security Scan (SAST)
@@ -134,11 +131,9 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           echo "🔍 Running Snyk code scan..."
-          # Try the code scan
-          if ! snyk code test --severity-threshold=high --sarif-file-output=snyk-code.sarif; then
+          if ! snyk code test --org=eyemusican --severity-threshold=high --sarif-file-output=snyk-code.sarif; then
             echo "⚠️ Snyk code test failed or found vulnerabilities, but continuing to generate SARIF"
-            # Ensure SARIF file is generated even if vulnerabilities are found
-            snyk code test --severity-threshold=high --sarif-file-output=snyk-code.sarif || true
+            snyk code test --org=eyemusican --severity-threshold=high --sarif-file-output=snyk-code.sarif || true
           fi
 
       - name: Check if SARIF file was generated
@@ -202,6 +197,7 @@ jobs:
         with:
           image: cicd-demo:latest
           args: >
+            --org=eyemusican
             --severity-threshold=high
             --file=dockerfile
             --exclude-base-image-vulns
@@ -239,7 +235,6 @@ jobs:
           echo "📦 Installing Snyk CLI for monitoring..."
           npm install -g snyk
           snyk --version
-          snyk auth ${{ secrets.SNYK_TOKEN }}
 
       - name: Monitor project with Snyk
         env:
@@ -250,8 +245,8 @@ jobs:
           echo "JAVA_HOME: $JAVA_HOME"
           echo "Java version: $(java -version)"
 
-          # Monitor the project for ongoing vulnerability tracking
           snyk monitor --maven \
+            --org=eyemusican \
             --project-name="${{ github.repository }}-production" \
             --target-reference="${{ github.ref }}" \
             --remote-repo-url="${{ github.server_url }}/${{ github.repository }}.git" \
