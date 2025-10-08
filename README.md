@@ -2,5 +2,4 @@
 
 PRACTICAL 4: INTEGRATING SNYK WITH GITHUB ACTION 
 
-
-hi i am checking on workdlows 
+![alt text](image.png)
